@@ -1,0 +1,22 @@
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### Mac OS ###
+.DS_Store
+
+### Example project
+project/project/
+project/target/
+target/
+
+### Scala ###
+*.class
+*.log
+
+### SBT ###
+.history
+
+stackoverflow.csv
