@@ -19,4 +19,4 @@ target/
 ### SBT ###
 .history
 
-stackoverflow.csv
+src/main/resources/
