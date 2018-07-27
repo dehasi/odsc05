@@ -20,22 +20,27 @@ object Extraction {
     (f - 32.0) * (5.0 / 9.0)
 
 
-  def toStation(line: String): Station = {
-    def parseLine(line: String): Array[String] = {
-      val array = Array("", "", "", "", "")
-      var i: Int = 0
-      for (c <- line) {
-        if (c == ',') {
-          i = i + 1
-        } else {
-          array(i) = array(i) + c
-        }
+  def parseLine(line: String): Array[String] = {
+    val array = Array("", "", "", "", "")
+    var i: Int = 0
+    for (c <- line) {
+      if (c == ',') {
+        i = i + 1
+      } else {
+        array(i) = array(i) + c
       }
-      array
     }
+    array
+  }
 
+  def toStation(line: String): Station = {
     val parsed = parseLine(line)
     new Station(parsed(0), parsed(1), Location(if (parsed(2).isEmpty) .0 else parsed(2).toDouble, if (parsed(3).isEmpty) .0 else parsed(3).toDouble))
+  }
+
+  def toTemperature(line: String): TemperatureRecord = {
+    val parsed = parseLine(line)
+    new TemperatureRecord(parsed(0), parsed(1), parsed(2).toInt, parsed(3).toInt, parsed(4).toDouble)
   }
 
   /**
@@ -47,7 +52,14 @@ object Extraction {
   def locateTemperatures(year: Year, stationsFile: String, temperaturesFile: String): Iterable[(LocalDate, Location, Temperature)] = {
     val stations = Source.fromFile(stationsFile, "UTF-8").getLines().toStream
       .map(toStation).toList
-    Seq()
+
+    Source.fromFile(temperaturesFile, "UTF-8").getLines().toStream
+      .map(toTemperature)
+      .map(tr => {
+        val station = stations.find(st => st.stn == tr.stn && st.wban == tr.wban ).get
+        (LocalDate.of(year, tr.month, tr.day), station.location, tr.getCelsius)
+      })
+      .toList
   }
 
   /**
