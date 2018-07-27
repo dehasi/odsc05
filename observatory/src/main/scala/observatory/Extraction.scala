@@ -22,7 +22,7 @@ object Extraction {
 
   def toStation(line: String): Station = {
     def parseLine(line: String): Array[String] = {
-      val array = Array("", "", "", "")
+      val array = Array("", "", "", "", "")
       var i: Int = 0
       for (c <- line) {
         if (c == ',') {
