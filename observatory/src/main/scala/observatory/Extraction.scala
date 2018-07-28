@@ -6,6 +6,8 @@ import java.time.LocalDate
 
 import akka.stream.javadsl.FileIO
 import com.univocity.parsers.csv.{CsvParser, CsvParserSettings}
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.{SparkConf, SparkContext}
 
 import scala.io.Source
 //import cats.effect.Sync
@@ -15,6 +17,24 @@ import fs2.{io, text}
   * 1st milestone: data extraction
   */
 object Extraction {
+
+//  @transient lazy val conf: SparkConf = new SparkConf().setMaster("local").setAppName("StackOverflow")
+//  @transient lazy val sc: SparkContext = new SparkContext(conf)
+
+  implicit val spark:SparkSession = SparkSession
+  .builder()
+  .master("local")
+  .appName(this.getClass.getSimpleName)
+  .getOrCreate()
+
+  import spark.implicits._
+  /** Main function */
+  //  def main(args: Array[String]): Unit = {
+  //
+  //    val lines   = sc.textFile("src/main/resources/stackoverflow/stackoverflow.csv")
+  //
+  //  }
+
 
   def fahrenheitToCelsius(f: Double): Double =
     (f - 32.0) * (5.0 / 9.0)
@@ -50,16 +70,17 @@ object Extraction {
     * @return A sequence containing triplets (date, location, temperature)
     */
   def locateTemperatures(year: Year, stationsFile: String, temperaturesFile: String): Iterable[(LocalDate, Location, Temperature)] = {
-    val stations = Source.fromFile(stationsFile, "UTF-8").getLines().toStream
+    val path = "src/main/resources/"
+    val stations = Source.fromFile(path +stationsFile, "UTF-8").getLines().toStream
       .map(toStation).toList
 
-    Source.fromFile(temperaturesFile, "UTF-8").getLines().toStream
+    Source.fromFile(path +temperaturesFile, "UTF-8").getLines().toStream
       .map(toTemperature)
       .map(tr => {
         val station = stations.find(st => st.stn == tr.stn && st.wban == tr.wban ).get
         (LocalDate.of(year, tr.month, tr.day), station.location, tr.getCelsius)
       })
-      .toList
+//      .toList
   }
 
   /**
