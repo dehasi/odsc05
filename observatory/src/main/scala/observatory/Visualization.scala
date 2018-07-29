@@ -33,27 +33,21 @@ object Visualization {
     * @param location     Location where to predict the temperature
     * @return The predicted temperature at `location`
     */
-  /*
-  [Test Description] [#2 - Raw data display] predicted temperature at location z should be closer to known temperature at location x than to known temperature at location y,
-  if z is closer (in distance) to x than y, and vice versa
-[Observed Error] NaN did not equal 10.0 +- 1.0E-4 Incorrect predicted temperature at Location(0.0,0.0): NaN. Expected: 10.0
-[Lost Points] 10
-   */
   def predictTemperature(temperatures: Iterable[(Location, Temperature)], location: Location): Temperature = {
-    val nom = temperatures
+    lazy val nom = temperatures
       .map(lt => (distance(location, lt._1), lt._2))
       .map(dt => (if (dt._1 ==0) 1 else 1.0 / math.pow(dt._1, p), dt._2))
       .map(wt => wt._1 * wt._2)
       .sum
 
-    val denom = temperatures
+    lazy val denom = temperatures
       .map(lt => distance(location, lt._1))
       .map(dt => 1.0 / math.pow(dt, p))
       .sum
 
     temperatures.find(temp => distance(temp._1, location) < 1) match {
       case Some(temp) => temp._2
-      case None =>  nom / denom //inverseDistanceWeight
+      case None =>  nom / denom
     }
   }
 
