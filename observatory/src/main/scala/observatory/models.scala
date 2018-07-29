@@ -47,15 +47,15 @@ case class CellPoint(x: Double, y: Double)
   */
 case class Color(red: Int, green: Int, blue: Int)
 
-case class Station(stn: String, wban: String, lat: Double, lon: Double) {
+case class Station(id: String, lat: Double, lon: Double) {
   def getLocation: Location = Location(lat, lon)
 }
 
-case class TemperatureRecord(stn: String, wban: String, year: Int, month: Int, day: Int, temperature: Double) {
+case class TemperatureRecord(id: String,  year: Int, month: Int, day: Int, temperature: Double) {
   def getCelsius: Double = (temperature - 32.0) * (5.0 / 9.0)
 }
 
-case class StationTemperature(stn: String, wban: String, lat: Double, lon: Double, year: Int, month: Int, day: Int, temperature: Double) {
+case class StationTemperature(id: String, lat: Double, lon: Double, year: Int, month: Int, day: Int, temperature: Double) {
   def getLocation: Location = Location(lat, lon)
 
   def getCelsius: Double = (temperature - 32.0) * (5.0 / 9.0)
