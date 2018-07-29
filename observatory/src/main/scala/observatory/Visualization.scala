@@ -42,7 +42,7 @@ object Visualization {
   def predictTemperature(temperatures: Iterable[(Location, Temperature)], location: Location): Temperature = {
     val nom = temperatures
       .map(lt => (distance(location, lt._1), lt._2))
-      .map(dt => (1.0 / math.pow(dt._1, p), dt._2))
+      .map(dt => (if (dt._1 ==0) 1 else 1.0 / math.pow(dt._1, p), dt._2))
       .map(wt => wt._1 * wt._2)
       .sum
 
@@ -51,7 +51,10 @@ object Visualization {
       .map(dt => 1.0 / math.pow(dt, p))
       .sum
 
-    nom / denom
+    temperatures.find(temp => distance(temp._1, location) < 1) match {
+      case Some(temp) => temp._2
+      case None =>  nom / denom //inverseDistanceWeight
+    }
   }
 
   /**
