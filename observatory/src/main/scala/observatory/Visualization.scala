@@ -60,7 +60,20 @@ object Visualization {
     * @return The color that corresponds to `value`, according to the color scale defined by `points`
     */
   def interpolateColor(points: Iterable[(Temperature, Color)], value: Temperature): Color = {
-    ???
+    val sorted = points.toSeq.sortBy(_._1)
+    if (value <= sorted.head._1) sorted.head._2
+    else if (value >= sorted.last._1) sorted.last._2
+    else {
+      val closestIndex = sorted.indexWhere(_._1 > value)
+      val (v1, c1) = sorted(closestIndex - 1)
+      val (v2, c2) = sorted(closestIndex)
+      val interpolate = (value - v1) / (v2 - v1)
+      val red = math.round(c1.red + (c2.red - c1.red) * interpolate).toInt
+      val green = math.round(c1.green + (c2.green - c1.green) * interpolate).toInt
+      val blue = math.round(c1.blue + (c2.blue - c1.blue) * interpolate).toInt
+
+      Color(red, green, blue)
+    }
   }
 
   /**
@@ -69,7 +82,16 @@ object Visualization {
     * @return A 360×180 image where each pixel shows the predicted temperature at its location
     */
   def visualize(temperatures: Iterable[(Location, Temperature)], colors: Iterable[(Temperature, Color)]): Image = {
-    ???
+    val pixels = for {
+      lat <- (-89 to 90).reverse
+      lon <- -180 to 179
+    } yield {
+      val t = predictTemperature(temperatures, Location(lat, lon))
+      val c = interpolateColor(colors, t)
+      Pixel(c.red, c.green, c.blue, 127)
+    }
+
+    Image(360, 180, pixels.toArray)
   }
 
 }
