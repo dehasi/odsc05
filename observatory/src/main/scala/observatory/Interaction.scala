@@ -35,7 +35,7 @@ object Interaction {
       y1 <- (fromY until toY).par
       x1 <- (fromX until toX).par
     } yield {
-      val t = predictTemperature(temperatures, tileLocation(Tile(x1, y1, tile.zoom+8)))
+      val t = predictTemperature(temperatures, tileLocation(Tile(x1, y1, tile.zoom + 8)))
       val c = interpolateColor(colors, t)
       Pixel(c.red, c.green, c.blue, 127)
     }
@@ -55,7 +55,15 @@ object Interaction {
                            yearlyData: Iterable[(Year, Data)],
                            generateImage: (Year, Tile, Data) => Unit
                          ): Unit = {
-    ???
+    for {
+      (year, data) <- yearlyData.par
+      zoom <- (0 to 3).par
+      y <- (0 until math.pow(2, zoom).toInt).par
+      x <- (0 until math.pow(2, zoom).toInt).par
+    } {
+      val tile = Tile(x,y,zoom)
+      generateImage(year, tile, data)
+    }
   }
 
 }
